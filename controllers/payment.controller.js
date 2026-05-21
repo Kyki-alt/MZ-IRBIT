@@ -8,6 +8,11 @@ const webmoneyResult = async (req, res) => {
 
     const body = req.body || {}
 
+    if (Object.keys(body).length === 0) {
+
+      return res.status(200).send('YES')
+    }
+
     console.log(
       'WEBMONEY BODY:',
       body
