@@ -44,14 +44,16 @@ app.get('/products', async (req, res) => {
 
     res.json(result.rows)
 
-  } catch (error) {
+    } catch (error) {
 
-    console.log(error)
+      console.error(error)
+      console.error(error.message)
+      console.error(error.stack)
 
-    res.status(500).json({
-      error: 'Ошибка сервера'
-    })
-  }
+      res.status(500).json({
+        error: 'Ошибка сервера'
+      })
+    }
 })
 
 // Получить категории
@@ -66,14 +68,16 @@ app.get('/categories', async (req, res) => {
 
     res.json(result.rows)
 
-  } catch (error) {
+    } catch (error) {
 
-    console.log(error)
+      console.error(error)
+      console.error(error.message)
+      console.error(error.stack)
 
-    res.status(500).json({
-      error: 'Ошибка сервера'
-    })
-  }
+      res.status(500).json({
+        error: 'Ошибка сервера'
+      })
+    }
 })
 
 // Получить новости
@@ -88,14 +92,16 @@ app.get('/news', async (req, res) => {
 
     res.json(result.rows)
 
-  } catch (error) {
+    } catch (error) {
 
-    console.log(error)
+      console.error(error)
+      console.error(error.message)
+      console.error(error.stack)
 
-    res.status(500).json({
-      error: 'Ошибка сервера'
-    })
-  }
+      res.status(500).json({
+        error: 'Ошибка сервера'
+      })
+    }
 })
 
 const PORT = process.env.PORT || 5000
