@@ -6,6 +6,13 @@ const webmoneyResult = async (req, res) => {
 
   try {
 
+    const body = req.body || {}
+
+    console.log(
+      'WEBMONEY BODY:',
+      body
+    )
+
     const {
 
       LMI_PAYEE_PURSE,
@@ -19,7 +26,7 @@ const webmoneyResult = async (req, res) => {
       LMI_PAYER_WM,
       LMI_HASH
 
-    } = req.body
+    } = body
 
     const secretKey =
       process.env.WM_SECRET
