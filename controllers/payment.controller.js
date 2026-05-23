@@ -2,29 +2,81 @@ const crypto = require('crypto')
 
 const pool = require('../db/db')
 
-export const webmoneyResult = async (req, res) => {
+
+const webmoneyResult = async (req, res) => {
+
+  
   try {
-    console.log('WEBMONEY BODY:', req.body)
 
-    const orderId =
-      Number(req.body.LMI_PAYMENT_NO)
+    console.log(req.body)
 
-    await pool.query(
+    const {
+
+      LMI_PAYMENT_NO,
+      LMI_PAYEE_PURSE,
+      LMI_PAYMENT_AMOUNT,
+      LMI_MODE,
+      LMI_SYS_INVS_NO,
+      LMI_SYS_TRANS_NO,
+      LMI_SYS_TRANS_DATE,
+      LMI_PAYER_PURSE,
+      LMI_PAYER_WM,
+
+      LMI_HASH
+
+    } = req.body
+
+    // проверка подписи
+    const hashString =
+
+      `${LMI_PAYEE_PURSE}` +
+      `${LMI_PAYMENT_AMOUNT}` +
+      `${LMI_PAYMENT_NO}` +
+      `${LMI_MODE}` +
+      `${LMI_SYS_INVS_NO}` +
+      `${LMI_SYS_TRANS_NO}` +
+      `${LMI_SYS_TRANS_DATE}` +
+      `${process.env.WM_SECRET_KEY}` +
+      `${LMI_PAYER_PURSE}` +
+      `${LMI_PAYER_WM}`
+
+    const checkHash = crypto
+      .createHash('sha256')
+      .update(hashString)
+      .digest('hex')
+      .toUpperCase()
+
+    if (checkHash !== LMI_HASH) {
+
+       console.log('INVALID HASH')
+
+      return res.status(400).send('Invalid hash')
+    }
+
+    // обновляем статус
+    const result = await pool.query(
+
       `
       UPDATE orders
-      SET status = 'paid'
+      SET payment_status = 'paid'
       WHERE id = $1
       `,
-      [orderId]
+
+      [LMI_PAYMENT_NO]
     )
 
-    return res.send('YES')
+    console.log('UPDATED:', result.rowCount)
+
+    res.send('YES')
+
   } catch (error) {
+
     console.log(error)
-    return res.status(500).send('ERROR')
+
+    res.status(500).send('ERROR')
   }
 }
 
 module.exports = {
   webmoneyResult
-}
+} 

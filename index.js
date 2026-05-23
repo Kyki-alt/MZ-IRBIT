@@ -1,5 +1,10 @@
 require('dotenv').config()
 
+console.log(
+  'SECRET:',
+  process.env.WM_SECRET_KEY
+)
+
 const express = require('express')
 const cors = require('cors')
 const pool = require('./db/db')
