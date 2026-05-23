@@ -136,6 +136,9 @@ const paymentSuccess = (req, res) => {
   )
 }
 
+app.get('/test-route', (req, res) => {
+  res.send('TEST WORKS')
+})
 
 module.exports = {
   webmoneyResult,
