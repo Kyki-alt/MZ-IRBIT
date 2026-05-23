@@ -115,7 +115,7 @@ const paymentFail = async (req, res) => {
     )
 
     res.redirect(
-      `https://mz-irbit-web.onrender.com/payment-failed?orderId=${orderId}`
+      `https://mz-irbit-web.onrender.com/payment-result?status=failed&orderId=${orderId}`
     )
 
   } catch (error) {
@@ -132,7 +132,7 @@ const paymentSuccess = (req, res) => {
    const orderId = req.query.orderId
 
   res.redirect(
-    `https://mz-irbit-web.onrender.com/payment-success?orderId=${orderId}`
+    `https://mz-irbit-web.onrender.com/payment-result?status=success&orderId=${orderId}`
   )
 }
 

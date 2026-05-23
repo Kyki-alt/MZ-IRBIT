@@ -16,9 +16,5 @@ router.post(
   createOrder
 )
 
-router.get(
-  '/:id/status',
-  getOrderStatus
-)
 
 module.exports = router
