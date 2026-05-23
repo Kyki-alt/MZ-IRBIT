@@ -3,23 +3,31 @@ const pool = require('../db/db')
 
 const webmoneyResult = async (req, res) => {
 
-  console.log('CONTENT-TYPE:', req.headers['content-type'])
   console.log('BODY:', req.body)
 
-  // FAIL REQUEST
-  if (req.body.LMI_FAILREQUEST === '1') {
-
-    console.log('FAIL PAYMENT')
-
-    return res.send('YES')
-  }
-
-  // защита от пустого body
-  if (!req.body || Object.keys(req.body).length === 0) {
-    return res.send('YES')
-  }
-
   try {
+
+        // FAIL REQUEST
+    if (req.body.LMI_FAILREQUEST === '1') {
+
+      console.log('FAIL PAYMENT')
+
+      await pool.query(
+        `
+        UPDATE orders
+        SET payment_status = 'failed'
+        WHERE id = $1
+        `,
+        [req.body.LMI_PAYMENT_NO]
+      )
+
+      return res.send('YES')
+    }
+
+    // защита от пустого body
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.send('YES')
+    }
 
     const {
       LMI_PAYMENT_NO,
@@ -35,12 +43,12 @@ const webmoneyResult = async (req, res) => {
       LMI_PREREQUEST
     } = req.body
 
-    console.log('HASH FROM WM:', LMI_HASH)
-
     // pre-request от WebMoney
     if (LMI_PREREQUEST === '1') {
       return res.send('YES')
     }
+
+    console.log('HASH FROM WM:', LMI_HASH)
 
     const hashString =
       `${LMI_PAYEE_PURSE}` +
@@ -121,7 +129,7 @@ const paymentFail = async (req, res) => {
 // SUCCESS URL
 const paymentSuccess = (req, res) => {
 
-  const orderId = req.query.orderId
+   const orderId = req.query.LMI_PAYMENT_NO
 
   res.redirect(
     `https://mz-irbit-web.onrender.com/payment-success?orderId=${orderId}`
