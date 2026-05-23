@@ -24,6 +24,8 @@ const createOrder = async (req, res) => {
 
     } = req.body
 
+    const isCod = payment_type === 'cod'
+
     // создаем заказ
     const orderResult = await pool.query(
 
@@ -50,7 +52,7 @@ const createOrder = async (req, res) => {
       VALUES (
         $1,$2,$3,$4,$5,
         $6,$7,$8,$9,$10,
-        'pending'
+        $11
       )
 
       RETURNING id
@@ -70,7 +72,8 @@ const createOrder = async (req, res) => {
         house,
         flat,
 
-        total_price
+        total_price,
+        isCod ? 'paid' : 'pending'
       ]
     )
 
@@ -106,10 +109,12 @@ const createOrder = async (req, res) => {
     }
 
     res.json({
-
       success: true,
+      orderId,
 
-      orderId
+       redirect: isCod
+      ? `/#/payment-result?status=cod&orderId=${orderId}`
+      : null
     })
 
   } catch (error) {
