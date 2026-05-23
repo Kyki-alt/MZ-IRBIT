@@ -52,6 +52,7 @@ const webmoneyResult = async (req, res) => {
       return res.status(400).send('Invalid hash')
     }
 
+    // успешная оплата
     const result = await pool.query(
       `
       UPDATE orders
@@ -73,6 +74,51 @@ const webmoneyResult = async (req, res) => {
   }
 }
 
+// SUCCESS URL
+const paymentSuccess = async (req, res) => {
+
+  res.redirect('https://mz-irbit-web.onrender.com/order-success')
+}
+
+// FAIL URL
+const paymentFail = async (req, res) => {
+
+ try {
+
+    const orderId = req.query.orderId
+
+    await pool.query(
+      `
+      UPDATE orders
+      SET payment_status = 'failed'
+      WHERE id = $1
+      `,
+      [orderId]
+    )
+
+    res.redirect(
+      `https://mz-irbit-web.onrender.com/payment-failed?orderId=${orderId}`
+    )
+
+  } catch (error) {
+
+    console.log(error)
+
+    res.status(500).send('ERROR')
+  }
+}
+
+const paymentSuccess = (req, res) => {
+
+  const orderId = req.query.orderId
+
+  res.redirect(
+    `https://mz-irbit-web.onrender.com/payment-success?orderId=${orderId}`
+  )
+}
+
 module.exports = {
-  webmoneyResult
+  webmoneyResult,
+  paymentSuccess,
+  paymentFail
 }

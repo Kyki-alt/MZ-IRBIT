@@ -3,23 +3,12 @@ const express = require('express')
 const router = express.Router()
 
 const {
+  webmoneyResult,
+  paymentFail
 
-  webmoneyResult
+} = require('../controllers/payment.controller')
 
-} = require(
-  '../controllers/payment.controller'
-)
-
-router.get(
-  '/webmoney/result',
-  (req, res) => {
-    res.send('RESULT URL WORKS')
-  }
-)
-
-router.post(
-  '/webmoney/result',
-  webmoneyResult
-)
+router.post('/webmoney/result', webmoneyResult)
+router.get('/fail', paymentFail)
 
 module.exports = router
