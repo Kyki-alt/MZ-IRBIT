@@ -3,9 +3,6 @@ const pool = require('../db/db')
 
 const webmoneyResult = async (req, res) => {
 
-  console.log('CONTENT-TYPE:', req.headers['content-type'])
-  console.log('BODY:', req.body)
-
   // защита от пустого body
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.send('YES')
@@ -49,9 +46,6 @@ const webmoneyResult = async (req, res) => {
       .update(hashString)
       .digest('hex')
       .toUpperCase()
-
-    console.log('HASH FROM WM:', LMI_HASH)
-    console.log('MY HASH:', checkHash)
 
     if (checkHash !== LMI_HASH) {
       console.log('INVALID HASH')
