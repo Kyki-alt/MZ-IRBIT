@@ -1,17 +1,19 @@
 const crypto = require('crypto')
-
 const pool = require('../db/db')
-
 
 const webmoneyResult = async (req, res) => {
 
-   console.log('CONTENT-TYPE:', req.headers['content-type'])
+  console.log('CONTENT-TYPE:', req.headers['content-type'])
+  console.log('BODY:', req.body)
+
+  // защита от пустого body
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.send('YES')
+  }
+
   try {
 
-    console.log(req.body)
-
     const {
-
       LMI_PAYMENT_NO,
       LMI_PAYEE_PURSE,
       LMI_PAYMENT_AMOUNT,
@@ -21,14 +23,16 @@ const webmoneyResult = async (req, res) => {
       LMI_SYS_TRANS_DATE,
       LMI_PAYER_PURSE,
       LMI_PAYER_WM,
-
-      LMI_HASH
-
+      LMI_HASH,
+      LMI_PREREQUEST
     } = req.body
 
-    // проверка подписи
-    const hashString =
+    // pre-request от WebMoney
+    if (LMI_PREREQUEST === '1') {
+      return res.send('YES')
+    }
 
+    const hashString =
       `${LMI_PAYEE_PURSE}` +
       `${LMI_PAYMENT_AMOUNT}` +
       `${LMI_PAYMENT_NO}` +
@@ -46,22 +50,20 @@ const webmoneyResult = async (req, res) => {
       .digest('hex')
       .toUpperCase()
 
+    console.log('HASH FROM WM:', LMI_HASH)
+    console.log('MY HASH:', checkHash)
+
     if (checkHash !== LMI_HASH) {
-
-       console.log('INVALID HASH')
-
+      console.log('INVALID HASH')
       return res.status(400).send('Invalid hash')
     }
 
-    // обновляем статус
     const result = await pool.query(
-
       `
       UPDATE orders
       SET payment_status = 'paid'
       WHERE id = $1
       `,
-
       [LMI_PAYMENT_NO]
     )
 
@@ -79,4 +81,4 @@ const webmoneyResult = async (req, res) => {
 
 module.exports = {
   webmoneyResult
-} 
+}
