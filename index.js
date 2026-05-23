@@ -12,17 +12,19 @@ const pool = require('./db/db')
 const app = express()
 
 app.use(cors())
-app.use(express.json())
-
 app.use(express.urlencoded({
   extended: true
 }))
+
+app.use(express.json())
 
 const ordersRoutes = require('./routes/orders.routes')
 app.use('/orders', ordersRoutes)
 
 const paymentRoutes = require('./routes/payment.routes')
 app.use('/payment', paymentRoutes)
+
+console.log(req.headers['content-type'])
 
 // Проверка сервера
 app.get('/', (req, res) => {
