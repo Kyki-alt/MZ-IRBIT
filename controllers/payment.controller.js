@@ -103,7 +103,7 @@ const paymentFail = async (req, res) => {
   try {
 
     const orderId =
-      req.query.LMI_PAYMENT_NO
+      req.query.orderId
 
     await pool.query(
       `
@@ -129,7 +129,7 @@ const paymentFail = async (req, res) => {
 // SUCCESS URL
 const paymentSuccess = (req, res) => {
 
-   const orderId = req.query.LMI_PAYMENT_NO
+   const orderId = req.query.orderId
 
   res.redirect(
     `https://mz-irbit-web.onrender.com/payment-success?orderId=${orderId}`
