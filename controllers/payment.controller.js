@@ -5,7 +5,7 @@ const pool = require('../db/db')
 
 const webmoneyResult = async (req, res) => {
 
-  
+   console.log('CONTENT-TYPE:', req.headers['content-type'])
   try {
 
     console.log(req.body)
