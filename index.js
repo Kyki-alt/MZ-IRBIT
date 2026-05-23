@@ -24,8 +24,6 @@ app.use('/orders', ordersRoutes)
 const paymentRoutes = require('./routes/payment.routes')
 app.use('/payment', paymentRoutes)
 
-console.log(req.headers['content-type'])
-
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
