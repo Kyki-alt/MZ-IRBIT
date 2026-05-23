@@ -75,9 +75,13 @@ const webmoneyResult = async (req, res) => {
 }
 
 // SUCCESS URL
-const paymentSuccess = async (req, res) => {
+const paymentSuccess = (req, res) => {
 
-  res.redirect('https://mz-irbit-web.onrender.com/order-success')
+  const orderId = req.query.orderId
+
+  res.redirect(
+    `https://mz-irbit-web.onrender.com/payment-success?orderId=${orderId}`
+  )
 }
 
 // FAIL URL
@@ -106,15 +110,6 @@ const paymentFail = async (req, res) => {
 
     res.status(500).send('ERROR')
   }
-}
-
-const paymentSuccess = (req, res) => {
-
-  const orderId = req.query.orderId
-
-  res.redirect(
-    `https://mz-irbit-web.onrender.com/payment-success?orderId=${orderId}`
-  )
 }
 
 module.exports = {
