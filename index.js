@@ -31,46 +31,11 @@ app.use(
 )
 
 const productsRouter = require('./routes/products')
-app.use('/products', productsRouter)
-
-const ordersRouter = require('./routes/orders')
-app.use('/orders', ordersRouter)
+app.use('/api/products', productsRouter)
 
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
-})
-
-// Получить товары
-app.get('/products', async (req, res) => {
-
-  try {
-
-    const result = await pool.query(`
-      SELECT
-        products.id,
-        products.title,
-        products.img,
-        products.description,
-        products.price,
-        categories.key_name AS category
-      FROM products
-      JOIN categories
-      ON products.category_id = categories.id
-    `)
-
-    res.json(result.rows)
-
-    } catch (error) {
-
-      console.error(error)
-      console.error(error.message)
-      console.error(error.stack)
-
-      res.status(500).json({
-        error: 'Ошибка сервера'
-      })
-    }
 })
 
 // Получить категории

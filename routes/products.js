@@ -3,30 +3,28 @@ const pool = require('../db/db')
 
 const router = express.Router()
 
-// получить все товары
+// GET ALL PRODUCTS
 router.get('/', async (req, res) => {
-
   try {
-
-    const products = await pool.query(`
-      SELECT *
+    const result = await pool.query(`
+      SELECT
+        products.id,
+        products.title,
+        products.img,
+        products.description,
+        products.price,
+        categories.key_name AS category
       FROM products
-      WHERE is_active = true
-      ORDER BY created_at DESC
+      JOIN categories
+      ON products.category_id = categories.id
     `)
 
-    res.json(products.rows)
+    res.json(result.rows)
 
-  } catch (err) {
-
-    console.error(err)
-
-    res.status(500).json({
-      message: 'Ошибка сервера'
-    })
-
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Ошибка сервера' })
   }
-
 })
 
 module.exports = router
