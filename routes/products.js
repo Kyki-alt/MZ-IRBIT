@@ -18,6 +18,7 @@ router.get('/', async (req, res) => {
         products.price,
         products.stock,
         products.is_active,
+        products.category_id
         categories.key_name AS category
       FROM products
       LEFT JOIN categories
@@ -56,6 +57,9 @@ router.post('/', async (req, res) => {
       })
     }
 
+    const parsedCategoryId =
+  category_id === '' ? null : Number(category_id)
+
     const result = await pool.query(
       `
       INSERT INTO products
@@ -70,7 +74,7 @@ router.post('/', async (req, res) => {
         description,
         is_active,
         img,
-        category_id
+        parsedCategoryId
       ]
     )
 
@@ -103,6 +107,9 @@ router.put('/:id', async (req, res) => {
       })
     }
 
+    const parsedCategoryId =
+    category_id === '' ? null : Number(category_id)
+    
     const result = await pool.query(
       `
       UPDATE products
@@ -124,7 +131,7 @@ router.put('/:id', async (req, res) => {
         description,
         is_active,
         img,
-        category_id,
+        parsedCategoryId,
         req.params.id
       ]
     )
