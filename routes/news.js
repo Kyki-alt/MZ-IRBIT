@@ -29,4 +29,12 @@ router.get('/', async (req, res) => {
 
 })
 
+router.post('/upload', upload.single('image'), (req, res) => {
+  const type = req.body.type || 'common'
+
+  res.json({
+    imageUrl: `/uploads/${type}/${req.file.filename}`
+  })
+})
+
 module.exports = router

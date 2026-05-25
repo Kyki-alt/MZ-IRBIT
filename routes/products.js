@@ -220,15 +220,10 @@ router.get('/categories', async (req, res) => {
 })
 
 router.post('/upload', upload.single('image'), (req, res) => {
-  console.log('UPLOAD HIT')
-  console.log('FILE:', req.file)
-
-  if (!req.file) {
-    return res.status(400).json({ error: 'File not received by multer' })
-  }
+  const type = req.body.type || 'common'
 
   res.json({
-    imageUrl: `${process.env.SERVER_URL}/uploads/${req.file.filename}`
+    imageUrl: `/uploads/${type}/${req.file.filename}`
   })
 })
 
