@@ -2,16 +2,16 @@ require('dotenv').config()
 
 const express = require('express')
 const cors = require('cors')
+const path = require('path')
+
 const pool = require('./db/db')
 
 const app = express()
 
 app.use(cors())
-app.use(express.urlencoded({
-  extended: true
-}))
-
 app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 const ordersRoutes = require('./routes/orders.routes')
@@ -22,8 +22,6 @@ app.use('/payment', paymentRoutes)
 
 const adminRoutes = require('./routes/admin')
 app.use('/admin', adminRoutes)
-
-const path = require('path')
 
 
 const productsRouter = require('./routes/products')
