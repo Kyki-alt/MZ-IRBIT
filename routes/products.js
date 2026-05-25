@@ -48,7 +48,6 @@ router.post('/', async (req, res) => {
       category_id
     } = req.body
 
-    // ❗ защита от отрицательной цены
     if (price < 0) {
       return res.status(400).json({
         error: 'Цена не может быть отрицательной'
@@ -58,7 +57,7 @@ router.post('/', async (req, res) => {
     const result = await pool.query(
       `
       INSERT INTO products
-      (title, price, stock, description, active, img, category_id)
+      (title, price, stock, description, is_active, img, category_id)
       VALUES ($1,$2,$3,$4,$5,$6,$7)
       RETURNING *
       `,
@@ -80,7 +79,6 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Ошибка добавления товара' })
   }
 })
-
 
 // =======================
 // UPDATE PRODUCT (PUT)
