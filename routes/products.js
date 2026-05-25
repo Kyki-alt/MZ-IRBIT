@@ -3,7 +3,9 @@ const pool = require('../db/db')
 
 const router = express.Router()
 
+// =======================
 // GET ALL PRODUCTS
+// =======================
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -13,10 +15,13 @@ router.get('/', async (req, res) => {
         products.img,
         products.description,
         products.price,
+        products.stock,
+        products.active,
         categories.key_name AS category
       FROM products
-      JOIN categories
+      LEFT JOIN categories
       ON products.category_id = categories.id
+      ORDER BY products.id DESC
     `)
 
     res.json(result.rows)
@@ -24,6 +29,130 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Ошибка сервера' })
+  }
+})
+
+
+// =======================
+// CREATE PRODUCT (POST)
+// =======================
+router.post('/', async (req, res) => {
+  try {
+    const {
+      title,
+      price,
+      stock,
+      description,
+      active,
+      img,
+      category_id
+    } = req.body
+
+    // ❗ защита от отрицательной цены
+    if (price < 0) {
+      return res.status(400).json({
+        error: 'Цена не может быть отрицательной'
+      })
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO products
+      (title, price, stock, description, active, img, category_id)
+      VALUES ($1,$2,$3,$4,$5,$6,$7)
+      RETURNING *
+      `,
+      [
+        title,
+        price,
+        stock,
+        description,
+        active,
+        img,
+        category_id
+      ]
+    )
+
+    res.json(result.rows[0])
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Ошибка добавления товара' })
+  }
+})
+
+
+// =======================
+// UPDATE PRODUCT (PUT)
+// =======================
+router.put('/:id', async (req, res) => {
+  try {
+    const {
+      title,
+      price,
+      stock,
+      description,
+      active,
+      img,
+      category_id
+    } = req.body
+
+    if (price < 0) {
+      return res.status(400).json({
+        error: 'Цена не может быть отрицательной'
+      })
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE products
+      SET
+        title = $1,
+        price = $2,
+        stock = $3,
+        description = $4,
+        active = $5,
+        img = $6,
+        category_id = $7
+      WHERE id = $8
+      RETURNING *
+      `,
+      [
+        title,
+        price,
+        stock,
+        description,
+        active,
+        img,
+        category_id,
+        req.params.id
+      ]
+    )
+
+    res.json(result.rows[0])
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Ошибка обновления товара' })
+  }
+})
+
+
+// =======================
+// DELETE PRODUCT
+// =======================
+router.delete('/:id', async (req, res) => {
+  try {
+    await pool.query(
+      `DELETE FROM products WHERE id = $1`,
+      [req.params.id]
+    )
+
+    res.json({ success: true })
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Ошибка удаления товара' })
   }
 })
 
