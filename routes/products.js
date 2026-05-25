@@ -220,8 +220,12 @@ router.get('/categories', async (req, res) => {
 })
 
 router.post('/upload', upload.single('image'), (req, res) => {
-  const type = req.body.type || 'common'
+  
+  console.log('FILE RECEIVED:', req.file)
+  console.log('BODY:', req.body)
 
+  const type = req.body.type || 'common'
+  
   res.json({
     imageUrl: `${process.env.SERVER_URL}/uploads/${type}/${req.file.filename}`
   })
