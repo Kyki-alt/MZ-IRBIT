@@ -18,14 +18,15 @@ router.post('/login', async (req, res) => {
 
     const admin = adminResult.rows[0];
 
-    if (!admin) {
-      return res.status(401).json({ message: 'Неверный логин' });
-    }
+        if (!admin) {
+        return res.status(401).json({ message: 'Неверный логин' });
+        }
 
-    // 2. проверяем пароль
-    console.log('BODY:', req.body);
-    console.log('ADMIN:', admin);
-    const isMatch = await bcrypt.compare(password, admin.password);
+        if (!admin.password) {
+        return res.status(500).json({ message: 'Пароль не найден' });
+        }
+
+        const isMatch = await bcrypt.compare(password, admin.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Неверный пароль' });
