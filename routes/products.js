@@ -57,8 +57,10 @@ router.post('/', async (req, res) => {
       })
     }
 
-    const parsedCategoryId =
-  category_id === '' ? null : Number(category_id)
+   const parsedCategoryId =
+  !category_id || category_id === '0'
+    ? null
+    : Number(category_id)
 
     const result = await pool.query(
       `
@@ -108,7 +110,9 @@ router.put('/:id', async (req, res) => {
     }
 
     const parsedCategoryId =
-    category_id === '' ? null : Number(category_id)
+  !category_id || category_id === '0'
+    ? null
+    : Number(category_id)
 
     const result = await pool.query(
       `
