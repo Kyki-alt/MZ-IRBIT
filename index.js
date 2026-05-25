@@ -22,6 +22,17 @@ app.use('/payment', paymentRoutes)
 const adminRoutes = require('./routes/admin')
 app.use('/admin', adminRoutes)
 
+const path = require('path')
+app.use(
+  '/uploads',
+  express.static(
+    path.join(__dirname, 'uploads')
+  )
+)
+
+const productsRouter = require('./routes/products')
+app.use('/products', productsRouter)
+
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
