@@ -9,6 +9,8 @@ const router = express.Router()
 // =======================
 router.get('/', async (req, res) => {
   try {
+    const showDeleted = req.query.deleted === 'true'
+
     const result = await pool.query(`
       SELECT
         products.id,
@@ -23,18 +25,16 @@ router.get('/', async (req, res) => {
       FROM products
       LEFT JOIN categories
       ON products.category_id = categories.id
-      WHERE products.is_deleted = FALSE
+      WHERE products.is_deleted = $1
       ORDER BY products.id DESC
-    `)
+    `, [showDeleted])
 
     res.json(result.rows)
-
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Ошибка сервера' })
   }
 })
-
 
 // =======================
 // CREATE PRODUCT (POST)
