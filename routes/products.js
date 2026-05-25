@@ -220,11 +220,11 @@ router.get('/categories', async (req, res) => {
 })
 
 router.post('/upload', upload.single('image'), (req, res) => {
-  const type = req.body.type || 'products'
+  const type = req.body.type || 'common'
 
-  const imageUrl = `/uploads/${type}/${req.file.filename}`
-
-  res.json({ imageUrl })
+  res.json({
+    imageUrl: `/uploads/${type}/${req.file.filename}`
+  })
 })
 
 module.exports = router
