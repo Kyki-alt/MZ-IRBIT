@@ -51,4 +51,45 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/check', async (req, res) => {
+
+  try {
+
+    const authHeader =
+      req.headers.authorization
+
+    if (!authHeader) {
+      return res.status(401).json({
+        message: 'Нет токена'
+      })
+    }
+
+    const token =
+      authHeader.split(' ')[1]
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    )
+
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({
+        message: 'Нет доступа'
+      })
+    }
+
+    return res.json({
+      ok: true,
+      admin: decoded
+    })
+
+  } catch (err) {
+
+    return res.status(401).json({
+      message: 'Невалидный токен'
+    })
+
+  }
+})
+
 module.exports = router;
