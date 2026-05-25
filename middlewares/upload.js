@@ -2,14 +2,13 @@ const multer = require('multer')
 const fs = require('fs')
 const path = require('path')
 
-// базовая папка
 const BASE_UPLOAD_DIR = path.join(__dirname, '..', 'uploads')
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const type = req.body.type || 'common'
+    const type = req.query.type || 'common'
 
-    const uploadPath = path.join(__dirname, '..', 'uploads', type)
+    const uploadPath = path.join(BASE_UPLOAD_DIR, type)
 
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true })
