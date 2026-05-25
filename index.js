@@ -33,6 +33,9 @@ app.use(
 const productsRouter = require('./routes/products')
 app.use('/products', productsRouter)
 
+const ordersRouter = require('./routes/orders')
+app.use('/orders', ordersRouter)
+
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
