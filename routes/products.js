@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
         products.description,
         products.price,
         products.stock,
-        products.active,
+        products.is_active,
         categories.key_name AS category
       FROM products
       LEFT JOIN categories
@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
       price,
       stock,
       description,
-      active,
+      is_active,
       img,
       category_id
     } = req.body
@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
         price,
         stock,
         description,
-        active,
+        is_active,
         img,
         category_id
       ]
@@ -92,7 +92,7 @@ router.put('/:id', async (req, res) => {
       price,
       stock,
       description,
-      active,
+      is_active,
       img,
       category_id
     } = req.body
@@ -111,7 +111,7 @@ router.put('/:id', async (req, res) => {
         price = $2,
         stock = $3,
         description = $4,
-        active = $5,
+        is_active = $5,
         img = $6,
         category_id = $7
       WHERE id = $8
@@ -122,7 +122,7 @@ router.put('/:id', async (req, res) => {
         price,
         stock,
         description,
-        active,
+        is_active,
         img,
         category_id,
         req.params.id
