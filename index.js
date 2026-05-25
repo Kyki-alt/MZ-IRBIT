@@ -12,7 +12,8 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+const UPLOAD_DIR = path.join(__dirname, 'uploads')
+app.use('/uploads', express.static(UPLOAD_DIR))
 
 const ordersRoutes = require('./routes/orders.routes')
 app.use('/orders', ordersRoutes)
@@ -22,7 +23,6 @@ app.use('/payment', paymentRoutes)
 
 const adminRoutes = require('./routes/admin')
 app.use('/admin', adminRoutes)
-
 
 const productsRouter = require('./routes/products')
 app.use('/api/products', productsRouter)

@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 
 // 1. гарантируем что папка uploads существует
-const uploadDir = path.join(__dirname, '..', 'uploads')
+const uploadDir = path.join(__dirname, 'uploads')
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
