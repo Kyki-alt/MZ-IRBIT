@@ -1,47 +1,51 @@
-const express = require('express')
-const jwt = require('jsonwebtoken')
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-const router = express.Router()
+const pool = require('../db/db');
+
+const router = express.Router();
 
 router.post('/login', async (req, res) => {
-
   try {
+    const { login, password } = req.body;
 
-    const { login, password } = req.body
+    // 1. ищем админа в БД
+    const adminResult = await pool.query(
+      'SELECT * FROM admins WHERE login = $1',
+      [login]
+    );
 
-    if (
-      login !== process.env.ADMIN_LOGIN ||
-      password !== process.env.ADMIN_PASSWORD
-    ) {
-      return res.status(401).json({
-        message: 'Неверный логин или пароль'
-      })
+    const admin = adminResult.rows[0];
+
+    if (!admin) {
+      return res.status(401).json({ message: 'Неверный логин' });
     }
 
-    const token = jwt.sign(
+    // 2. проверяем пароль
+    const isMatch = await bcrypt.compare(password, admin.password);
 
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Неверный пароль' });
+    }
+
+    // 3. создаём JWT
+    const token = jwt.sign(
       {
+        id: admin.id,
+        login: admin.login,
         role: 'admin'
       },
-
       process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-      {
-        expiresIn: '7d'
-      }
-    )
-
-    res.json({
-      token
-    })
+    return res.json({ token });
 
   } catch (err) {
-
-    res.status(500).json({
-      message: 'Ошибка сервера'
-    })
-
+    console.error(err);
+    return res.status(500).json({ message: 'Ошибка сервера' });
   }
-})
+});
 
-module.exports = router
+module.exports = router;
