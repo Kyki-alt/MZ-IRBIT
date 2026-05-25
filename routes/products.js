@@ -210,7 +210,7 @@ router.get('/categories', async (req, res) => {
 
 router.post('/upload', upload.single('image'), (req, res) => {
   res.json({
-    imageUrl: `${API_URL}/uploads/${req.file.filename}`
+    imageUrl: `/uploads/${req.file.filename}`
   })
 })
 

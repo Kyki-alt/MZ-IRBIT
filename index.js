@@ -12,7 +12,7 @@ app.use(express.urlencoded({
 }))
 
 app.use(express.json())
-app.use('/uploads', express.static('uploads'))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 const ordersRoutes = require('./routes/orders.routes')
 app.use('/orders', ordersRoutes)
@@ -24,12 +24,7 @@ const adminRoutes = require('./routes/admin')
 app.use('/admin', adminRoutes)
 
 const path = require('path')
-app.use(
-  '/uploads',
-  express.static(
-    path.join(__dirname, 'uploads')
-  )
-)
+
 
 const productsRouter = require('./routes/products')
 app.use('/api/products', productsRouter)
