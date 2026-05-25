@@ -23,6 +23,8 @@ router.post('/login', async (req, res) => {
     }
 
     // 2. проверяем пароль
+    console.log('BODY:', req.body);
+    console.log('ADMIN:', admin);
     const isMatch = await bcrypt.compare(password, admin.password);
 
     if (!isMatch) {
