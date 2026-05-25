@@ -12,6 +12,7 @@ app.use(express.urlencoded({
 }))
 
 app.use(express.json())
+app.use('/uploads', express.static('uploads'))
 
 const ordersRoutes = require('./routes/orders.routes')
 app.use('/orders', ordersRoutes)
