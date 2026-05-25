@@ -33,7 +33,7 @@ router.post('/upload', upload.single('image'), (req, res) => {
   const type = req.body.type || 'common'
 
   res.json({
-    imageUrl: `${process.env.SERVER_URL}/uploads/${type}/${req.file.filename}`
+    imageUrl: `/uploads/${type}/${req.file.filename}`
   })
 })
 
