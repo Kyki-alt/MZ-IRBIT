@@ -19,9 +19,6 @@ app.use('/orders', ordersRoutes)
 const paymentRoutes = require('./routes/payment.routes')
 app.use('/payment', paymentRoutes)
 
-const adminRoutes = require('./models/Admin')
-app.use('/admin', adminRoutes)
-
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
