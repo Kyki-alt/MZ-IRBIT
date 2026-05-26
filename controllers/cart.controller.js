@@ -7,31 +7,30 @@ const validateCart = async (req, res) => {
     const errors = []
 
     for (const item of items) {
-      const result = await pool.query(
-        `
-        SELECT id, stock
-        FROM products
-        WHERE id = $1
-        `,
-        [item.id]
-      )
+        const result = await pool.query(
+            `
+            SELECT id, stock
+            FROM products
+            WHERE id = $1
+            `,
+            [item.id]
+        )
 
-      const product = result.rows[0]
+        const product = result.rows[0]
 
-      if (!product) {
-        errors.push({
-          id: item.id,
-          message: 'Товар не найден'
-        })
-        continue
-      }
+            if (!product) {
+            return res.status(400).json({
+                ok: false,
+                error: `Товар id=${item.id} не найден`
+            })
+            }
 
-      if (product.stock < item.quantity) {
-        errors.push({
-          id: item.id,
-          message: `Недостаточно товара. Осталось: ${product.stock}`
-        })
-      }
+            if (product.stock < item.quantity) {
+            return res.status(400).json({
+                ok: false,
+                error: `Недостаточно товара id=${item.id}. Осталось: ${product.stock}`
+            })
+        }
     }
 
     if (errors.length > 0) {
