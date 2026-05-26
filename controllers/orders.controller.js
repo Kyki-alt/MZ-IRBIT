@@ -77,6 +77,21 @@ const createOrder = async (req, res) => {
       ]
     )
 
+    for (const item of items) {
+
+      await pool.query(
+        `
+        UPDATE products
+        SET stock = stock - $1
+        WHERE id = $2
+        `,
+        [
+          item.quantity,
+          item.id
+        ]
+      )
+    }
+
     const orderId =
       orderResult.rows[0].id
 
