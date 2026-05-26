@@ -29,6 +29,9 @@ app.use('/admin', adminRoutes)
 const productsRouter = require('./routes/products')
 app.use('/api/products', productsRouter)
 
+const cartRoutes = require('./routes/cart.routes')
+app.use('/cart', cartRoutes)
+
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
