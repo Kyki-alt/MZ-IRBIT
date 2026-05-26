@@ -4,44 +4,56 @@ const validateCart = async (req, res) => {
   try {
     const { items } = req.body
 
-    const errors = []
+    const resultItems = []
 
     for (const item of items) {
-        const result = await pool.query(
-            `
-            SELECT id, stock
-            FROM products
-            WHERE id = $1
-            `,
-            [item.id]
-        )
+      const productResult = await pool.query(
+        `SELECT id, stock FROM products WHERE id = $1`,
+        [item.id]
+      )
 
-        const product = result.rows[0]
+      const product = productResult.rows[0]
 
-            if (!product) {
-            return res.status(400).json({
-                ok: false,
-                error: `Товар id=${item.id} не найден`
-            })
-            }
+      if (!product) {
+        resultItems.push({
+          id: item.id,
+          status: 'missing',
+          message: 'Товар не найден',
+          available: 0
+        })
+        continue
+      }
 
-            if (product.stock < item.quantity) {
-            return res.status(400).json({
-                ok: false,
-                error: `Недостаточно товара id=${item.id}. Осталось: ${product.stock}`
-            })
-        }
-    }
+      if (product.stock <= 0) {
+        resultItems.push({
+          id: item.id,
+          status: 'out_of_stock',
+          message: 'Нет в наличии',
+          available: 0
+        })
+        continue
+      }
 
-    if (errors.length > 0) {
-      return res.status(400).json({
-        ok: false,
-        errors
+      if (product.stock < item.quantity) {
+        resultItems.push({
+          id: item.id,
+          status: 'partial',
+          message: `Доступно только ${product.stock}`,
+          available: product.stock
+        })
+        continue
+      }
+
+      resultItems.push({
+        id: item.id,
+        status: 'ok',
+        available: item.quantity
       })
     }
 
     return res.json({
-      ok: true
+      ok: true,
+      items: resultItems
     })
 
   } catch (error) {
