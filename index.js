@@ -35,6 +35,9 @@ app.use('/cart', cartRoutes)
 const newsRoutes = require('./routes/news')
 app.use('/api/news', newsRoutes)
 
+const categoriesRoutes = require('./routes/categories')
+app.use('/api/categories', categoriesRoutes)
+
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
@@ -64,29 +67,6 @@ app.get('/categories', async (req, res) => {
     }
 })
 
-// Получить новости
-app.get('/news', async (req, res) => {
-
-  try {
-
-    const result =
-      await pool.query(
-        'SELECT * FROM news ORDER BY id DESC'
-      )
-
-    res.json(result.rows)
-
-    } catch (error) {
-
-      console.error(error)
-      console.error(error.message)
-      console.error(error.stack)
-
-      res.status(500).json({
-        error: 'Ошибка сервера'
-      })
-    }
-})
 
 const PORT = process.env.PORT || 5000
 
