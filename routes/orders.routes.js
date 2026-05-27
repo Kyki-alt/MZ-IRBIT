@@ -16,19 +16,69 @@ router.get('/', async (req, res) => {
   try {
 
     const result = await pool.query(`
-      SELECT *
+
+      SELECT
+        orders.*,
+
+        json_agg(
+          json_build_object(
+            'product_id', order_items.product_id,
+            'quantity', order_items.quantity,
+            'price', order_items.price,
+            'title', products.title
+          )
+        ) AS items
+
       FROM orders
-      ORDER BY id DESC
+
+      LEFT JOIN order_items
+      ON orders.id = order_items.order_id
+
+      LEFT JOIN products
+      ON products.id = order_items.product_id
+
+      GROUP BY orders.id
+
+      ORDER BY orders.id DESC
+
     `)
 
     res.json(result.rows)
 
   } catch (e) {
 
-    console.log('ORDERS ERROR:', e)
+    console.log(e)
 
     res.status(500).json({
       error: 'Ошибка получения заказов'
+    })
+  }
+})
+
+router.patch('/:id/status', async (req, res) => {
+
+  try {
+
+    const { status } = req.body
+
+    const result = await pool.query(
+      `
+      UPDATE orders
+      SET payment_status = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [status, req.params.id]
+    )
+
+    res.json(result.rows[0])
+
+  } catch (e) {
+
+    console.log(e)
+
+    res.status(500).json({
+      error: 'Ошибка обновления статуса'
     })
   }
 })
