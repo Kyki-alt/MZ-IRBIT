@@ -26,6 +26,9 @@ app.use('/payment', paymentRoutes)
 const adminRoutes = require('./routes/admin')
 app.use('/admin', adminRoutes)
 
+const createAdminRoutes = require('./routes/createAdmin')
+app.use('/admin', createAdminRoutes)
+
 const productsRouter = require('./routes/products')
 app.use('/api/products', productsRouter)
 

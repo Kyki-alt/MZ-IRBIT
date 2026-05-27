@@ -73,3 +73,5 @@ router.get('/list', auth, async (req, res) => {
     res.status(500).json({ message: 'Ошибка сервера' })
   }
 })
+
+module.exports = router
