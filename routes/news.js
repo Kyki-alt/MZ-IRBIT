@@ -28,15 +28,15 @@ router.get('/', async (req, res) => {
 // =======================
 router.post('/', async (req, res) => {
   try {
-    const { title, description, img } = req.body
+    const { title, description, image } = req.body
 
     const result = await pool.query(
       `
-      INSERT INTO news (title, description, img)
+      INSERT INTO news (title, description, image)
       VALUES ($1, $2, $3)
       RETURNING *
       `,
-      [title, description, img]
+      [title, description, image]
     )
 
     res.json(result.rows[0])
@@ -51,18 +51,18 @@ router.post('/', async (req, res) => {
 // =======================
 router.put('/:id', async (req, res) => {
   try {
-    const { title, description, img } = req.body
+    const { title, description, image } = req.body
 
     const result = await pool.query(
       `
       UPDATE news
       SET title = $1,
           description = $2,
-          img = $3
+          image = $3
       WHERE id = $4
       RETURNING *
       `,
-      [title, description, img, req.params.id]
+      [title, description, image, req.params.id]
     )
 
     res.json(result.rows[0])
