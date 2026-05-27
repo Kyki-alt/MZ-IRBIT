@@ -2,20 +2,9 @@ const express = require('express')
 const pool = require('../db/db')
 const multer = require('multer')
 const path = require('path')
+const upload = require('./middleware/upload')
 
 const router = express.Router()
-
-// ================= MULTER =================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/news/')
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname))
-  }
-})
-
-const upload = multer({ storage })
 
 // ================= GET NEWS =================
 router.get('/', async (req, res) => {
