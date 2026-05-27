@@ -32,6 +32,9 @@ app.use('/api/products', productsRouter)
 const cartRoutes = require('./routes/cart.routes')
 app.use('/cart', cartRoutes)
 
+const newsRoutes = require('./routes/news')
+app.use('/api/news', newsRoutes)
+
 // Проверка сервера
 app.get('/', (req, res) => {
   res.send('Server works!')
