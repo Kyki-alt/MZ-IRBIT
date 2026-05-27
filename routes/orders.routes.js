@@ -98,4 +98,37 @@ router.patch('/:id/status', async (req, res) => {
   }
 })
 
+// архивировать
+router.patch('/:id/archive', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      UPDATE orders
+      SET is_archived = TRUE
+      WHERE id = $1
+      RETURNING *
+    `, [req.params.id])
+
+    res.json(result.rows[0])
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка архивации' })
+  }
+})
+
+
+//  восстановить
+router.patch('/:id/restore', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      UPDATE orders
+      SET is_archived = FALSE
+      WHERE id = $1
+      RETURNING *
+    `, [req.params.id])
+
+    res.json(result.rows[0])
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка восстановления' })
+  }
+})
+
 module.exports = router
