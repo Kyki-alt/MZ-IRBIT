@@ -32,8 +32,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Неверный пароль' });
     }
 
-    // 3. создаём JWT
-    const token = jwt.sign(
+     const token = jwt.sign(
       {
         id: admin.id,
         login: admin.login,
@@ -52,43 +51,18 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/check', async (req, res) => {
-
   try {
+    const token = req.headers.authorization?.split(' ')[1]
 
-    const authHeader =
-      req.headers.authorization
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-    if (!authHeader) {
-      return res.status(401).json({
-        message: 'Нет токена'
-      })
-    }
-
-    const token =
-      authHeader.split(' ')[1]
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    )
-
-    if (decoded.role !== 'admin') {
-      return res.status(403).json({
-        message: 'Нет доступа'
-      })
-    }
-
-    return res.json({
+    res.json({
       ok: true,
       admin: decoded
     })
 
-  } catch (err) {
-
-    return res.status(401).json({
-      message: 'Невалидный токен'
-    })
-
+  } catch {
+    res.status(401).json({ message: 'Невалидный токен' })
   }
 })
 
