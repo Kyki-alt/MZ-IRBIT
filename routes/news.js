@@ -7,19 +7,18 @@ const router = express.Router()
 // =======================
 // GET NEWS
 // =======================
-router.get('/', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT *
-      FROM news
-      WHERE is_deleted = FALSE OR is_deleted IS NULL
-      ORDER BY id DESC
-    `)
+    await pool.query(`
+      UPDATE news
+      SET is_deleted = true
+      WHERE id = $1
+    `, [req.params.id])
 
-    res.json(result.rows)
+    res.json({ success: true })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Ошибка сервера' })
+    res.status(500).json({ error: 'Ошибка удаления' })
   }
 })
 
