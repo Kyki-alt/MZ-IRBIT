@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
         products.stock,
         products.is_active,
         products.category_id,
-        categories.key_name AS category
+        categories.name AS category
       FROM products
       LEFT JOIN categories
       ON products.category_id = categories.id
