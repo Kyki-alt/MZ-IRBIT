@@ -7,18 +7,19 @@ const router = express.Router()
 // =======================
 // GET NEWS
 // =======================
-router.delete('/:id', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    await pool.query(`
-      UPDATE news
-      SET is_deleted = true
-      WHERE id = $1
-    `, [req.params.id])
+    const result = await pool.query(`
+      SELECT *
+      FROM news
+      WHERE is_deleted = FALSE OR is_deleted IS NULL
+      ORDER BY id DESC
+    `)
 
-    res.json({ success: true })
+    res.json(result.rows)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Ошибка удаления' })
+    res.status(500).json({ error: 'Ошибка сервера' })
   }
 })
 
@@ -74,23 +75,20 @@ router.put('/:id', async (req, res) => {
 // =======================
 // DELETE NEWS
 // =======================
-router.delete('/:id', async (req, res) => {
-  try {
-    await pool.query(
-      `
-      UPDATE news
-      SET is_deleted = TRUE
-      WHERE id = $1
-      `,
-      [req.params.id]
-    )
+  router.delete('/:id', async (req, res) => {
+    try {
+      await pool.query(`
+        UPDATE news
+        SET is_deleted = true
+        WHERE id = $1
+      `, [req.params.id])
 
-    res.json({ success: true })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Ошибка удаления' })
-  }
-})
+      res.json({ success: true })
+    } catch (error) {
+      console.error(error)
+      res.status(500).json({ error: 'Ошибка удаления' })
+    }
+  })
 
 // =======================
 // UPLOAD (КАК В ТОВАРАХ)
