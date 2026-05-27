@@ -29,13 +29,13 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
 
-    const { key_name, name } = req.body
+    const { name } = req.body
 
     const result = await pool.query(`
-      INSERT INTO categories (key_name, name)
-      VALUES ($1, $2)
+      INSERT INTO categories (name)
+      VALUES ($1)
       RETURNING *
-    `, [key_name, name])
+    `, [name])
 
     res.json(result.rows[0])
 
@@ -53,15 +53,14 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
 
-    const { key_name, name } = req.body
+    const { name } = req.body
 
     const result = await pool.query(`
       UPDATE categories
-      SET key_name = $1,
-          name = $2
-      WHERE id = $3
+      SET name = $1,
+      WHERE id = $2
       RETURNING *
-    `, [key_name, name, req.params.id])
+    `, [name, req.params.id])
 
     res.json(result.rows[0])
 
