@@ -20,22 +20,37 @@ router.get('/', async (req, res) => {
       SELECT
         orders.*,
 
-        json_agg(
-          json_build_object(
-            'product_id', order_items.product_id,
-            'quantity', order_items.quantity,
-            'price', order_items.price,
-            'title', products.title
+        COALESCE(
+
+          json_agg(
+
+            json_build_object(
+
+              'product_id', products.id,
+              'title', products.title,
+              'quantity', order_items.quantity,
+              'price', order_items.price,
+              'img', products.img
+
+            )
+
           )
+
+          FILTER (
+            WHERE products.id IS NOT NULL
+          ),
+
+          '[]'
+
         ) AS items
 
       FROM orders
 
       LEFT JOIN order_items
-      ON orders.id = order_items.order_id
+        ON order_items.order_id = orders.id
 
       LEFT JOIN products
-      ON products.id = order_items.product_id
+        ON products.id = order_items.product_id
 
       GROUP BY orders.id
 
