@@ -1,23 +1,20 @@
 const express = require('express')
+const pool = require('../db/db')
 
 const router = express.Router()
 
 const {
-
-  createOrder,
-  getOrderStatus
-
-} = require(
-  '../controllers/orders.controller'
-)
-
-router.post(
-  '/',
   createOrder
-)
+} = require('../controllers/orders.controller')
 
+// СОЗДАНИЕ ЗАКАЗА
+router.post('/', createOrder)
+
+// ПОЛУЧИТЬ ВСЕ ЗАКАЗЫ
 router.get('/', async (req, res) => {
+
   try {
+
     const result = await pool.query(`
       SELECT *
       FROM orders
@@ -25,8 +22,14 @@ router.get('/', async (req, res) => {
     `)
 
     res.json(result.rows)
+
   } catch (e) {
-    res.status(500).json({ error: 'Ошибка получения заказов' })
+
+    console.log('ORDERS ERROR:', e)
+
+    res.status(500).json({
+      error: 'Ошибка получения заказов'
+    })
   }
 })
 
