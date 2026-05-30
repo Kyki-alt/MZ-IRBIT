@@ -219,9 +219,9 @@ router.get('/receipt/:id', async (req, res) => {
 
     const doc = new PDFDocument()
 
-    doc.font(path.join(__dirname, '../fonts/arial.ttf'))
-
     doc.pipe(res)
+
+    doc.font(path.join(__dirname, '../fonts/arial.ttf'))
 
     doc.fontSize(22)
     doc.text('Кассовый чек')
