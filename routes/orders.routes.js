@@ -2,6 +2,7 @@ const express = require('express')
 const pool = require('../db/db')
 
 const router = express.Router()
+const PDFDocument = require('pdfkit')
 
 const {
   createOrder
@@ -131,47 +132,102 @@ router.patch('/:id/restore', async (req, res) => {
   }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/receipt/:id', async (req, res) => {
   try {
+
+    const orderId = req.params.id
+
     const orderResult = await pool.query(
       `
       SELECT *
       FROM orders
       WHERE id = $1
       `,
-      [req.params.id]
+      [orderId]
     )
 
-    if (!orderResult.rows.length) {
+    if (orderResult.rows.length === 0) {
       return res.status(404).json({
         error: 'Заказ не найден'
       })
     }
 
+    const order = orderResult.rows[0]
+
     const itemsResult = await pool.query(
       `
-      SELECT
-        oi.product_id,
-        oi.quantity,
-        oi.price,
-        p.title
-      FROM order_items oi
-      LEFT JOIN products p
-      ON p.id = oi.product_id
-      WHERE oi.order_id = $1
+      SELECT *
+      FROM order_items
+      WHERE order_id = $1
       `,
-      [req.params.id]
+      [orderId]
     )
 
-    res.json({
-      ...orderResult.rows[0],
-      items: itemsResult.rows
+    const items = itemsResult.rows
+
+    res.setHeader(
+      'Content-Type',
+      'application/pdf'
+    )
+
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename=receipt-${orderId}.pdf`
+    )
+
+    const doc = new PDFDocument()
+
+    doc.pipe(res)
+
+    doc.fontSize(22)
+    doc.text('Кассовый чек')
+
+    doc.moveDown()
+
+    doc.fontSize(14)
+    doc.text(`Заказ № ${order.id}`)
+    doc.text(`Покупатель: ${order.customer_name}`)
+    doc.text(`Телефон: ${order.phone}`)
+
+    if (order.email) {
+      doc.text(`Email: ${order.email}`)
+    }
+
+    doc.moveDown()
+
+    doc.text('Товары:')
+
+    doc.moveDown(0.5)
+
+    items.forEach(item => {
+
+      const sum =
+        Number(item.price) *
+        Number(item.quantity)
+
+      doc.text(
+        `${item.title} × ${item.quantity} = ${sum} ₽`
+      )
+
     })
+
+    doc.moveDown()
+
+    doc.fontSize(18)
+    doc.text(
+      `Итого: ${order.total_price} ₽`
+    )
+
+    doc.end()
+
   } catch (error) {
-    console.error(error)
+
+    console.log(error)
+
     res.status(500).json({
-      error: 'Ошибка получения заказа'
+      error: 'Ошибка генерации чека'
     })
+
   }
 })
 
