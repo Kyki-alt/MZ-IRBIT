@@ -131,4 +131,59 @@ router.patch('/:id/restore', async (req, res) => {
   }
 })
 
+router.get('/:id', async (req, res) => {
+
+  try {
+
+    const result = await pool.query(`
+      SELECT
+        orders.*,
+
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'product_id', products.id,
+              'title', products.title,
+              'quantity', order_items.quantity,
+              'price', order_items.price,
+              'img', products.img
+            )
+          )
+          FILTER (
+            WHERE products.id IS NOT NULL
+          ),
+          '[]'
+        ) AS items
+
+      FROM orders
+
+      LEFT JOIN order_items
+        ON order_items.order_id = orders.id
+
+      LEFT JOIN products
+        ON products.id = order_items.product_id
+
+      WHERE orders.id = $1
+
+      GROUP BY orders.id
+    `, [req.params.id])
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: 'Заказ не найден'
+      })
+    }
+
+    res.json(result.rows[0])
+
+  } catch (e) {
+
+    console.log(e)
+
+    res.status(500).json({
+      error: 'Ошибка получения заказа'
+    })
+  }
+})
+
 module.exports = router
