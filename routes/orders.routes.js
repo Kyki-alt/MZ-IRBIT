@@ -222,7 +222,7 @@ router.get('/receipt/:id', async (req, res) => {
 
     doc.pipe(res)
 
-    doc.font(path.join(__dirname, '../fonts/arial.ttf'))
+    doc.font(path.join(__dirname, '../fonts/DejaVuSans.ttf'))
 
     doc.fontSize(22)
     doc.text('Кассовый чек')
