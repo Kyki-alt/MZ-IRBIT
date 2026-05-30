@@ -132,54 +132,43 @@ router.patch('/:id/restore', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-
   try {
-
-    const result = await pool.query(`
-      SELECT
-        orders.*,
-
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'product_id', products.id,
-              'title', products.title,
-              'quantity', order_items.quantity,
-              'price', order_items.price,
-              'img', products.img
-            )
-          )
-          FILTER (
-            WHERE products.id IS NOT NULL
-          ),
-          '[]'
-        ) AS items
-
+    const orderResult = await pool.query(
+      `
+      SELECT *
       FROM orders
+      WHERE id = $1
+      `,
+      [req.params.id]
+    )
 
-      LEFT JOIN order_items
-        ON order_items.order_id = orders.id
-
-      LEFT JOIN products
-        ON products.id = order_items.product_id
-
-      WHERE orders.id = $1
-
-      GROUP BY orders.id
-    `, [req.params.id])
-
-    if (!result.rows.length) {
+    if (!orderResult.rows.length) {
       return res.status(404).json({
         error: 'Заказ не найден'
       })
     }
 
-    res.json(result.rows[0])
+    const itemsResult = await pool.query(
+      `
+      SELECT
+        oi.product_id,
+        oi.quantity,
+        oi.price,
+        p.title
+      FROM order_items oi
+      LEFT JOIN products p
+      ON p.id = oi.product_id
+      WHERE oi.order_id = $1
+      `,
+      [req.params.id]
+    )
 
-  } catch (e) {
-
-    console.log(e)
-
+    res.json({
+      ...orderResult.rows[0],
+      items: itemsResult.rows
+    })
+  } catch (error) {
+    console.error(error)
     res.status(500).json({
       error: 'Ошибка получения заказа'
     })
